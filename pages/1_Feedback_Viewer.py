@@ -13,7 +13,7 @@ from datetime import datetime, timedelta
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # Maintenant, nous pouvons importer les modules du dossier parent
-from utils.data_loader import get_all_interactions
+from utils.database import get_all_interactions
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
