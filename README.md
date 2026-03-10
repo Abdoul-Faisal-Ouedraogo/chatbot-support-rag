@@ -121,3 +121,90 @@ L'application sera accessible à l'adresse http://localhost:8501 dans votre navi
 
 ## Fonctionnalités principales
 
+### Classification des requêtes
+
+L'application détermine automatiquement si une question nécessite une recherche RAG ou si une réponse directe du modèle Mistral est suffisante. Cela permet d'optimiser les performances et la pertinence des réponses. 
+Elle Permet aussi une supervision humaine via un système de tickets et un tableau de feedback.
+
+### Paramètres personnalisables
+
+Dans la barre latérale, vous pouvez ajuster :
+- Le modèle Mistral (Small ou Large)
+- Le nombre de documents à récupérer (1-20)
+- Le score minimum de similarité (0-100%)
+
+### Feedback et analyse
+
+L'application enregistre les interactions et les feedbacks des utilisateurs. Vous pouvez visualiser les statistiques dans la page "Feedback Viewer".
+
+## Modules principaux
+
+### `utils/vector_store.py`
+
+Gère l'index vectoriel FAISS et la recherche sémantique :
+- Chargement, nettoyage et découpage des documents en chunks exploitables
+- Génération des embeddings à l’aide d’un modèle de type Sentence Transformers
+- Construction et mise à jour de l’index FAISS pour la recherche vectorielle
+- Recherche des passages les plus pertinents en fonction de la requête utilisateur
+- Gestion du score de similarité et filtrage des résultats
+
+### `utils/query_classifier.py`
+
+Détermine si une requête nécessite une recherche RAG oun une réponse direct:
+- Analyse linguistique et détection de mots-clés
+- Classification légère basée sur le modèle Mistral
+- Distinction entre questions générales (réponse directe) et questions documentaires (RAG)
+- Amélioration de la précision et réduction des appels inutiles au RAG
+
+### `utils/database.py`
+
+Gère la base de données SQLite pour les interactions, feedbacks et tickets:
+- Enregistrement des questions, réponses, sources et métadonnées
+- Stockage des feedbacks utilisateurs (👍 / 👎 + commentaire)
+- Suivi des interactions pour analyse et supervision
+- Création et gestion des tickets d’escalade en cas d’insatisfaction
+- Récupération des statistiques et historique des conversations
+
+### `utils/memory.py`
+
+Gère la mémoire conversationnelle de l’assistant:
+- Stockage des derniers échanges pour maintenir le contexte
+- Reconstruction du fil de conversation pour les questions implicites
+- Gestion d’une fenêtre de contexte configurable
+- Amélioration de la cohérence des réponses sur plusieurs tours
+
+### `utils/tickets.py`
+
+Gère la création et le suivi des tickets d’escalade :
+- Génération d’un ticket lorsqu’un utilisateur demande de l’aide humaine
+- Enregistrement en base de données (motif, message, timestamp)
+- Intégration avec le système de frustration pour escalade automatique
+- Suivi des demandes non résolues
+
+### `MistralChat.py`
+
+Fichier principal de l’application Streamlit :
+- Interface de chat interactive avec l’utilisateur
+- Gestion des paramètres (mode RAG, seuils, nombre de documents)
+- Appels au modèle Mistral pour la génération de réponses
+- Affichage des sources, du score de similarité et du contexte
+- Intégration du feedback utilisateur (👍 / 👎)
+- Connexion avec tous les modules internes (RAG, mémoire, sentiment, tickets)
+
+### `pages/1_Feedback_Viewer.py`
+
+Page Streamlit dédiée à l’analyse des interactions :
+- Visualisation des questions, réponses et sources utilisées
+- Affichage des feedbacks et commentaires utilisateurs
+- Consultation des métadonnées (mode, score, temps)
+- Outil de supervision pour améliorer la qualité du système RAG
+
+## Personnalisation
+
+Vous pouvez personnaliser l'application en modifiant les paramètres dans `utils/config.py` :
+- Modèles Mistral utilisés
+- Taille des chunks et chevauchement
+- Nombre de documents par défaut
+- Score de similatité
+
+
